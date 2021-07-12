@@ -19,4 +19,11 @@ base 64 encoded
 > Sessions are server side
 
 ## Install JSON Web Token
-[] npm i jsonwebtoken
+[] npm i jsonwebtoken\
+
+
+## Install bcrypt
+https://www.npmjs.com/package/bcrypt
+[] npm install bcrypt
+
+NOTE:  Ended at 13/21

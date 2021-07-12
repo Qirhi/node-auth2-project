@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const Users = require("../users/users-model.js");
+const { default: jwtDecode } = require("jwt-decode");
 
 router.post("/register", validateRoleName, (req, res, next) => {
   /**
@@ -19,7 +20,8 @@ router.post("/register", validateRoleName, (req, res, next) => {
     }
    */
   let user = req.body;
-
+  // Make sure role_name is defined by taking from middleware req object
+  user.role_name = req.role_name; 
   // bcrypt the password before saving
   const rounds = process.env.BCRYTPT_ROUNDS || 12;
   const hash = bcrypt.hashSync(user.password, rounds);
@@ -62,9 +64,11 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
 
   Users.findBy({ username })
     .then(([user]) => {
+      console.log("user:", user);
       if (user && bcrypt.compareSync(password, user.password)) {
         // create a token
         const token = makeToken(user);
+        console.log(jwtDecode(token));
         res.status(200).json({ message: `${user.username} is back`, token });
       } else {
         res.status(401).json({ message: "Invalid credentials" });
@@ -76,13 +80,14 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
 
 function makeToken(user){
   const payload = {
-    subject:user.id,
+    subject:user.user_id,
     username:user.username,
     role_name:user.role_name,
   }
   const options = {
     expiresIn: "500s"
   }
+  console.log("make token:", jwt.sign(payload,JWT_SECRET,options))
   return jwt.sign(payload,JWT_SECRET,options)
 }
 

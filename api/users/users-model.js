@@ -95,11 +95,14 @@ function findById(user_id) {
     "role_name": "team lead"
   }
  */
+// PROBLEM: will crash if role_name is undefined!
 async function add({ username, password, role_name }) { // done for you
   let created_user_id
+
   await db.transaction(async trx => {
     let role_id_to_use
-    const [role] = await trx('roles').where('role_name', role_name)
+    const [role] = await trx('roles')
+    .where('role_name', role_name)
     if (role) {
       role_id_to_use = role.role_id
     } else {
